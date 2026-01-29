@@ -1,9 +1,11 @@
 (() => {
   const resolveImg = (base) => {
     const exts = ['png','jpg','jpeg','webp'];
-    // We already have correct files in assets/, but base comes like "image-4"
-    // We'll try the common extensions.
-    for (const ext of exts) return `assets/${base}.${ext}`;
+    // Prefer PNG (у нас большинство скринов png). Если не загрузится — пользователь всё равно сможет открыть другие превью из галерей.
+    for (const ext of exts) {
+      return `assets/${base}.${ext}`;
+    }
+    return `assets/${base}.png`;
   };
 
   const tooltip = document.getElementById('tooltip');
@@ -62,7 +64,18 @@
     hide();
   });
 
-  document.addEventListener('click', (e) => {
+  
+  // Click on tooltip image -> open lightbox (full size)
+  timg.style.cursor = 'zoom-in';
+  timg.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (!timg.getAttribute('src')) return;
+    // src like assets/image-4.png -> take filename
+    const src = timg.getAttribute('src');
+    const filename = src.split('/').pop();
+    openLb(filename, tcap.textContent || '');
+  });
+document.addEventListener('click', (e) => {
     const btn = e.target.closest('.imgref');
     if (btn) {
       e.preventDefault();
